@@ -77,6 +77,15 @@ def _iter_issues_minimal(yt_query: str, page_size: int = 100):
 # ---- Helpers ----
 
 
+import re
+
+_KEY_RE = re.compile(r"^[A-Z][A-Z0-9_]*-\d+$")
+
+def _is_valid_issue_key(s: str) -> bool:
+    return bool(s) and bool(_KEY_RE.match(s))
+
+
+
 # youtrack_queries.py
 
 from datetime import date
@@ -323,3 +332,224 @@ def get_task_counts_by_type(period_key: str) -> Dict[str, Dict[str, Any]]:
             "after_exclude": after_exclude,
         },
     }
+
+# ================== Section 3: Deployments on Live (backend) ==================
+from period_utils import get_field_period_filter
+from datetime import datetime, timezone
+import re
+
+# Lock to what your instance shows in debug: Relates, Subtask (skip Duplicate)
+_DEPLOYMENT_LINK_TYPES = {"relates", "subtask"}
+
+_KEY_RE = re.compile(r"^[A-Z][A-Z0-9_]*-\d+$")
+def _is_valid_issue_key(s: str) -> bool:
+    return bool(s) and bool(_KEY_RE.match(s))
+
+
+def get_deployments_on_live(
+    project: str,
+    period_key: str,
+    *,
+    link_types: set[str] | None = None,
+    discover_link_types: bool = False,
+) -> dict:
+    if not project or not YOUTRACK_URL or not YOUTRACK_TOKEN:
+        return {"deployments": [], "debug": {"query": "", "count": 0}}
+
+    # Build the YouTrack query (project + Type:Deployment + Due Date period + exclude subtasks)
+    due_clause = get_field_period_filter("due date", period_key)
+    proj_clause = f"project: {{{project}}}"
+    no_subtasks_clause = "has: -{subtask of}"
+    yt_query = f"{proj_clause} Type:{{Deployment}} {due_clause} {no_subtasks_clause}".strip()
+
+    # Include internal id so fallback /links call works
+    fields = (
+        "idReadable,id,summary,dueDate,"
+        "customFields(name,value(name,localizedName,date)),"
+        "links(direction,linkType(name),issues("
+        "  idReadable,id,summary,created,project(shortName),"
+        "  customFields(name,value(name,localizedName))"
+        "))"
+    )
+
+    # Allowed link types
+    allowed = None if discover_link_types else {s.strip().lower() for s in (link_types or _DEPLOYMENT_LINK_TYPES)}
+    seen_link_types: set[str] = set()
+    deployments: list[dict] = []
+
+    for dep in _iter_issues_with_fields(yt_query, fields=fields, page_size=100):
+        dep_id_readable = dep.get("idReadable") or ""
+        dep_dbid = dep.get("id") or ""  # internal YouTrack id
+        title = dep.get("summary") or ""
+        due_iso = _extract_due_date_iso(dep)
+
+        linked_out: list[dict] = []
+        seen_ids: set[str] = set()  # track final readable keys to avoid duplicates
+
+        # ---- A) Try inline-expanded links first
+        inline_links = dep.get("links") or []
+        inline_count = _collect_links_into(
+            inline_links, allowed, seen_link_types, seen_ids, linked_out
+        )
+
+        # ---- B) Fallback: call /api/issues/{<internal id>}/links if needed
+        if inline_count == 0 and dep_dbid:
+            try:
+                params = {
+                    "fields": (
+                        "direction,linkType(name),issues("
+                        "  idReadable,id,summary,created,project(shortName),"
+                        "  customFields(name,value(name,localizedName))"
+                        ")"
+                    )
+                }
+                direct_links = _get(f"/api/issues/{dep_dbid}/links", params=params) or []
+                _collect_links_into(direct_links, allowed, seen_link_types, seen_ids, linked_out)
+            except Exception:
+                pass  # still return the deployment row even if fallback fails
+
+        deployments.append({
+            "deployment_id": dep_id_readable,
+            "deployment_title": title,
+            "due_date": due_iso,
+            "linked": linked_out,
+        })
+
+    debug = {"query": yt_query, "count": len(deployments)}
+    if discover_link_types:
+        debug["link_types_seen"] = sorted(seen_link_types)
+    return {"deployments": deployments, "debug": debug}
+
+
+def _collect_links_into(links_payload, allowed, seen_link_types, seen_ids, linked_out) -> int:
+    """
+    Parse a links collection and append resolved linked issues into linked_out.
+    - Validates readable keys (e.g., APLUS-1234); resolves weird keys via internal id.
+    - Skips items that cannot be resolved to a proper readable key.
+    Returns how many linked issues were appended.
+    """
+    appended = 0
+    for link in links_payload or []:
+        ltype_raw = ((link.get("linkType") or {}).get("name") or "").strip()
+        ltype = ltype_raw.lower()
+        if seen_link_types is not None:
+            seen_link_types.add(ltype_raw)
+        if (allowed is not None) and (ltype not in allowed):
+            continue
+
+        for li in (link.get("issues") or []):
+            # Raw fields from link payload
+            iid_readable = (li.get("idReadable") or "").strip()
+            iid_internal = (li.get("id") or "").strip()
+            project_short = ((li.get("project") or {}).get("shortName") or "").strip().upper()
+            itype = _extract_type_from_issue(li)
+            istate = _extract_state_from_issue(li)
+            title = (li.get("summary") or "").strip()
+
+            # created_on from ms -> YYYY-MM-DD
+            created_iso = ""
+            created_ms = li.get("created")
+            if isinstance(created_ms, (int, float)) and created_ms > 0:
+                created_iso = datetime.fromtimestamp(created_ms / 1000.0, tz=timezone.utc).date().isoformat()
+
+            # Decide whether we must resolve:
+            # - weird or missing readable key, or
+            # - missing basic fields (project/type/state/title/created_on)
+            needs_resolve = (not _is_valid_issue_key(iid_readable)) or (not project_short or not itype or not istate)
+
+            if needs_resolve:
+                issue_key = iid_internal or iid_readable  # prefer internal id
+                try:
+                    resolved = _get(
+                        f"/api/issues/{issue_key}",
+                        params={
+                            "fields": "idReadable,summary,created,project(shortName),"
+                                      "customFields(name,value(name,localizedName))"
+                        },
+                    ) or {}
+                    # Fill/override from resolved payload
+                    iid_readable = (resolved.get("idReadable") or "").strip() or iid_readable
+                    project_short = project_short or ((resolved.get("project") or {}).get("shortName") or "").strip().upper()
+                    itype = itype or _extract_type_from_issue(resolved) or "Unspecified"
+                    istate = istate or _extract_state_from_issue(resolved) or "Unspecified"
+                    title = title or (resolved.get("summary") or "").strip()
+                    if not created_iso:
+                        r_ms = resolved.get("created")
+                        if isinstance(r_ms, (int, float)) and r_ms > 0:
+                            created_iso = datetime.fromtimestamp(r_ms / 1000.0, tz=timezone.utc).date().isoformat()
+                except Exception:
+                    # ignore; we'll validate key below
+                    pass
+
+            # If after resolve we still don't have a proper readable key, skip this entry
+            if not _is_valid_issue_key(iid_readable):
+                continue
+
+            # Dedup on final readable key
+            if iid_readable in seen_ids:
+                continue
+            seen_ids.add(iid_readable)
+
+            linked_out.append({
+                "id": iid_readable,
+                "project": project_short,
+                "type": itype or "Unspecified",
+                "state": istate or "Unspecified",
+                "title": title,
+                "created_on": created_iso,
+            })
+            appended += 1
+    return appended
+
+
+def _iter_issues_with_fields(yt_query: str, *, fields: str, page_size: int = 100):
+    skip = 0
+    while True:
+        params = {"query": yt_query, "fields": fields, "$top": page_size, "$skip": skip}
+        batch = _get("/api/issues", params=params)
+        if not batch:
+            break
+        for item in batch:
+            yield item
+        if len(batch) < page_size:
+            break
+        skip += page_size
+
+
+def _extract_due_date_iso(issue) -> str | None:
+    ms = issue.get("dueDate")
+    if isinstance(ms, (int, float)) and ms > 0:
+        try:
+            return datetime.fromtimestamp(ms / 1000.0, tz=timezone.utc).date().isoformat()
+        except Exception:
+            pass
+    for f in issue.get("customFields", []) or []:
+        if (f.get("name") or "").strip().lower() in {"due date", "duedate"}:
+            v = f.get("value")
+            if isinstance(v, (int, float)) and v > 0:
+                try:
+                    return datetime.fromtimestamp(v / 1000.0, tz=timezone.utc).date().isoformat()
+                except Exception:
+                    return None
+            if isinstance(v, dict):
+                if "date" in v and isinstance(v["date"], (int, float)) and v["date"] > 0:
+                    try:
+                        return datetime.fromtimestamp(v["date"] / 1000.0, tz=timezone.utc).date().isoformat()
+                    except Exception:
+                        return None
+                s = (v.get("name") or "").strip()
+                if s:
+                    try:
+                        return datetime.fromisoformat(s).date().isoformat()
+                    except Exception:
+                        return s
+            if isinstance(v, str) and v.strip():
+                s = v.strip()
+                try:
+                    return datetime.fromisoformat(s).date().isoformat()
+                except Exception:
+                    return s
+    return None
+# ================== /Section 3: Deployments on Live (backend) ==================
+
+
