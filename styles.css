@@ -1,0 +1,129 @@
+:root {
+  --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --root-font: 12px;
+
+  --size-title: 20px;
+  --size-section-title: 14px;
+  --size-label: 13px;
+  --size-card-title: 13px;
+  --size-text: 12px;
+  --size-pill: 13px;
+
+  --w-type: 800;
+  --w-pill: 700;
+  --w-state: 700;
+  --w-note: 900;
+
+  --card-width: 210px;
+  --card-min-h: 110px;
+  --card-pad: 1px 10px;
+  --card-gap: 6px;
+  --card-border-color: #2f2f2f;
+  --card-border-width: 2px;
+  --card-radius: 8px;
+
+  --bar-color: #080101;
+  --bar-thickness: 1px;
+  --bar-margin: 5px 0 8px 0;
+
+  --sel-font: 12px;
+  --sel-height: 26px;
+  --sel-pad: 2px 6px;
+  --sel-width: 200px;
+}
+
+/* Global */
+html { font-size: var(--root-font) !important; }
+html, body, [class^="block-container"] { font-family: var(--font); }
+.block-container { padding-top: 18px; padding-bottom: 18px; }
+
+/* Title */
+.center-title {
+  text-align:center; font-size: var(--size-title); font-weight: 800;
+  margin: 6px 0 2px 0; letter-spacing: .2px;
+}
+
+/* Dividers */
+.bar {
+  height: var(--bar-thickness);
+  background: var(--bar-color);
+  margin: var(--bar-margin);
+}
+
+/* Form labels */
+.label { font-weight:700; font-size: var(--size-label); margin-bottom: 4px; }
+
+/* Section title */
+.section-title {
+  text-align:center; font-weight:800; margin: 0px 0 0px 0;
+  font-size: var(--size-section-title);
+}
+
+/* Card grid */
+.row { display:flex; flex-wrap: wrap; gap: var(--card-gap); align-items: stretch; }
+.card {
+  width: var(--card-width);
+  border: var(--card-border-width) solid var(--card-border-color);
+  border-radius: var(--card-radius);
+  background:#fff;
+  padding: var(--card-pad);
+  min-height: var(--card-min-h);
+  box-sizing: border-box;
+}
+.card h4 {
+  margin: 0;
+  font-size: var(--size-card-title);
+  font-weight: 600; /* base; parts below override */
+  display:flex; align-items:center; gap: 3px;
+}
+.card h4 .type-label { font-weight: var(--w-type); }
+.card .muted {
+  font-size: var(--size-text); color:#333;
+  line-height: 1.2; margin-top: 0;
+}
+.card .muted .state-count { font-weight: var(--w-state); }
+
+.pill {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width: 18px; height: 20px; padding: 0 8px;
+  border: var(--card-border-width) solid var(--card-border-color);
+  border-radius:999px;
+  font-size: var(--size-pill);
+  font-weight: var(--w-pill);
+  background:#eee;
+}
+
+/* --- Link resets inside cards (force override Streamlit blue) --- */
+.card a.chip-link,
+.card a.chip-link:link,
+.card a.chip-link:visited,
+.card a.state-link,
+.card a.state-link:link,
+.card a.state-link:visited,
+.card h4 a.type-label,
+.card h4 a.type-label:link,
+.card h4 a.type-label:visited {
+  color: inherit !important;
+  text-decoration: none !important;
+  font-weight: inherit !important;
+}
+.card a.chip-link:hover,
+.card a.state-link:hover,
+.card h4 a.type-label:hover {
+  text-decoration: underline !important;  /* change to 'none' if you prefer no hover underline */
+  color: inherit !important;
+}
+
+.smallnote { font-size: var(--size-text); font-weight: var(--w-note); margin-top: 6px; }
+
+/* Selectbox sizing */
+.stSelectbox { max-width: var(--sel-width); }
+div[data-baseweb="select"] {
+  font-size: var(--sel-font);
+  min-height: var(--sel-height) !important;
+}
+div[data-baseweb="select"] > div {
+  min-height: var(--sel-height) !important;
+  padding: var(--sel-pad) !important;
+  line-height: 1.2;
+}
