@@ -96,7 +96,7 @@ else:
         "Change Request" : "#07B176",
     }
     PALETTE = [
-        "#1F77B4", "#FF7F0E", "#2CA02C", "#D62728",
+        "#146f91", "#075066", "#9b59b6", "#f39c12",
         "#34495e", "#1abc9c", "#f38942", "#7f8c8d"
     ]
     palette_idx = 0
@@ -145,7 +145,6 @@ else:
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
 #______________________Section 2 ENDS_____________________________________________________________________
-
 
 # ______________________ Section 3 STARTS ______________________________________
 from youtrack_queries import get_deployments_on_live
@@ -259,6 +258,7 @@ table_html.append("</div>")
 st.markdown("".join(table_html), unsafe_allow_html=True)
 st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
 # ______________________ Section 3 ENDS ________________________________________
+
 
 
 
