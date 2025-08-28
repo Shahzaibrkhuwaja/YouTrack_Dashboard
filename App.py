@@ -147,5 +147,116 @@ else:
 #______________________Section 2 ENDS_____________________________________________________________________
 
 
+# ______________________ Section 3 STARTS ______________________________________
+from youtrack_queries import get_deployments_on_live
+import os
+from datetime import datetime
 
+st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+st.markdown('<div class="section-title">Deployments</div>', unsafe_allow_html=True)
+st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+
+# Fetch data
+resp = get_deployments_on_live(project, period_key, link_types={"relates","subtask"})
+deployments = resp.get("deployments", []) or []
+
+# Flatten rows and build quick stats
+rows = []
+type_counts = {}
+total_tasks = 0
+for dep in deployments:
+    dep_id = dep.get("deployment_id")
+    dep_due = dep.get("due_date")
+    for li in dep.get("linked", []):
+        total_tasks += 1
+        t = (li.get("type") or "Unspecified").strip()
+        type_counts[t] = type_counts.get(t, 0) + 1
+        rows.append({
+            "deployment_id": dep_id,
+            "task_id": li.get("id"),
+            "title": li.get("title") or "",
+            "type": t,
+            "state": li.get("state") or "",
+            "created_on": li.get("created_on") or "",   # <-- use backend value
+            "deployed_on": dep_due or "",
+        })
+
+
+# --- KPI strip (centered) ---
+# --- KPI strip (all types, no "Others") ---
+def _pill(label, value):
+    return f"<div class='kpi-pill'><b>{label}:</b> {value}</div>"
+
+# Preferred display order; any extra types will follow alphabetically
+preferred = [
+    "Bug", "Change Request", "New Requirement", "Enhancement",
+    "System Understanding", "Tech Task", "Exceptional Cases",
+    "External Dependency", "End User Mistake",
+]
+
+# Build ordered list of all types present
+present_types = list(type_counts.keys())
+ordered = [t for t in preferred if t in present_types] + \
+          sorted(t for t in present_types if t not in preferred)
+
+kpis = [
+    _pill("Total Deployments", len(deployments)),
+    _pill("Deployed Tasks", total_tasks),
+]
+for t in ordered:
+    kpis.append(_pill(t, type_counts.get(t, 0)))
+
+st.markdown("<div class='kpi-strip'>" + "".join(kpis) + "</div>", unsafe_allow_html=True)
+st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+
+
+
+
+# Build YouTrack links
+base = os.getenv("YOUTRACK_URL", "").rstrip("/")
+def issue_link(key: str) -> str:
+    return f"{base}/issue/{key}" if (base and key) else "#"
+
+# Render table header
+table_html = [
+    "<div class='table-scroll'>",
+    "<table class='yt-table'>",
+    "<thead><tr>",
+    "<th>Deployment ID</th><th>Task ID</th><th>Title</th><th>Type</th><th>State</th><th>Created On</th><th>Deployed On</th>",
+    "</tr></thead>",
+    "<tbody>",
+]
+
+# Sort rows by deployed_on desc, then task_id
+def _parse_date(d):
+    try:
+        return datetime.strptime(d, "%Y-%m-%d")
+    except Exception:
+        return datetime.min
+
+rows_sorted = sorted(rows, key=lambda r: (_parse_date(r["deployed_on"]), r["task_id"] or ""), reverse=True)
+
+for r in rows_sorted:
+    dep_href = issue_link(r["deployment_id"])
+    task_href = issue_link(r["task_id"])
+    table_html.append(
+        "<tr>"
+        f"<td><a class='state-link' href='{dep_href}' target='_blank'>{r['deployment_id'] or ''}</a></td>"
+        f"<td><a class='state-link' href='{task_href}' target='_blank'>{r['task_id'] or ''}</a></td>"
+        f"<td>{r['title'] or ''}</td>"
+        f"<td>{r['type'] or ''}</td>"
+        f"<td>{r['state'] or ''}</td>"
+        f"<td>{r['created_on'] or ''}</td>"
+        f"<td>{r['deployed_on'] or ''}</td>"
+        "</tr>"
+    )
+
+if not rows_sorted:
+    table_html.append("<tr><td colspan='7' class='muted'>No deployments found for this Project/Period.</td></tr>")
+
+table_html.append("</tbody></table>")
+table_html.append("</div>")
+st.markdown("".join(table_html), unsafe_allow_html=True)
+st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+# ______________________ Section 3 ENDS ________________________________________
 
