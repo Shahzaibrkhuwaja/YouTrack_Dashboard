@@ -3,7 +3,8 @@ ACTIVE_PROJECTS = [
     "APLUS",
     "AT",
     "AC",
-    # "MEP",
+    "MEP",
+    "ARG100"
 ]
 
 # Period filters (for Created Date)

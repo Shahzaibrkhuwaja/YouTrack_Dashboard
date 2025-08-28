@@ -7,7 +7,7 @@
   --size-label: 13px;
   --size-card-title: 13px;
   --size-text: 12px;
-  --size-pill: 13px;
+  --size-pill: 12px;
 
   --w-type: 800;
   --w-pill: 700;
@@ -85,7 +85,7 @@ html, body, [class^="block-container"] { font-family: var(--font); }
 
 .pill {
   display:inline-flex; align-items:center; justify-content:center;
-  min-width: 18px; height: 20px; padding: 0 8px;
+  width: 42px; height: 20px; padding: 0 8px;
   border: var(--card-border-width) solid var(--card-border-color);
   border-radius:999px;
   font-size: var(--size-pill);

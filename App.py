@@ -76,7 +76,7 @@ st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
 
 #______________________Section 2 STARTS___________________________________________________________________
 st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
-st.markdown('<div class="section-title">Tasks Created per Month (by Type)</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Tasks Created Per Month in Current Year (by Type)</div>', unsafe_allow_html=True)
 
 year = date.today().year
 current_month = date.today().month
