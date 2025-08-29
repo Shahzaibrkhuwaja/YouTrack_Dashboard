@@ -256,3 +256,56 @@ div[data-baseweb="select"] > div {
     padding: 8px 6px;
     font-size: 12px;
 }
+
+
+/* Fancy "Send" button */
+.stForm .stButton > button {
+    background: linear-gradient(90deg, #0748B1, #07B176);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 600;
+    letter-spacing: .2px;
+    box-shadow: 0 6px 14px rgba(7,177,118,.22);
+    transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+    .stForm .stButton > button:hover {
+        filter: saturate(1.05) brightness(1.05);
+        box-shadow: 0 8px 18px rgba(7,177,118,.32);
+    }
+
+    .stForm .stButton > button:active {
+        transform: translateY(1px);
+    }
+
+/* Centered pre-submit hero */
+.empty-hero {
+    height: 42vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .empty-hero .box {
+        text-align: center;
+        background: #fff;
+        border: 1px dashed #e6e6ea;
+        border-radius: 12px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+
+    .empty-hero .title {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: .2px;
+        color: #1f3c6d;
+        margin-bottom: 6px;
+    }
+
+    .empty-hero .sub {
+        font-size: 14px;
+        color: #444;
+    }

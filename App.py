@@ -26,21 +26,62 @@ with open("styles.css", "r", encoding="utf-8") as f:
 #  Header
 st.markdown('<div class="center-title">YouTrack Dashboard</div>', unsafe_allow_html=True)
 
-#  Controls 
-c1, c2, c3 = st.columns([1, 1, 10])
-with c1:
-    st.markdown('<div class="label">Project</div>', unsafe_allow_html=True)
-    project = st.selectbox("Project", ACTIVE_PROJECTS, index=0, label_visibility="collapsed")
-with c2:
-    st.markdown('<div class="label">Period</div>', unsafe_allow_html=True)
-    labels = list(PERIOD_LABELS.values())
-    keys = list(PERIOD_LABELS.keys())
-    idx = 0
-    selected_label = st.selectbox("Period", labels, index=idx, label_visibility="collapsed")
-    period_key = keys[labels.index(selected_label)]
-with c3:
-    st.write("")
+# ---- Defaults from session (persist last submitted) ----
+_default_project = st.session_state.get("selected_project", ACTIVE_PROJECTS[0])
+_default_period_key = st.session_state.get("selected_period_key", list(PERIOD_LABELS.keys())[0])
+_default_period_label = PERIOD_LABELS[_default_period_key]
 
+# ---- Controls (FORM with Send button) ----
+with st.form("filters_form", clear_on_submit=False):
+    c1, c2, c3 = st.columns([1, 1, 10])
+    with c1:
+        st.markdown('<div class="label">Project</div>', unsafe_allow_html=True)
+        project_choice = st.selectbox(
+            "Project",
+            ACTIVE_PROJECTS,
+            index=ACTIVE_PROJECTS.index(_default_project),
+            label_visibility="collapsed",
+            key="project_select",
+        )
+    with c2:
+        st.markdown('<div class="label">Period</div>', unsafe_allow_html=True)
+        labels = list(PERIOD_LABELS.values())
+        keys = list(PERIOD_LABELS.keys())
+        idx = labels.index(_default_period_label)
+        selected_label = st.selectbox(
+            "Period",
+            labels,
+            index=idx,
+            label_visibility="collapsed",
+            key="period_select",
+        )
+        period_key_choice = keys[labels.index(selected_label)]
+    with c3:
+        st.markdown('<div style="height:22px"></div>', unsafe_allow_html=True)
+        submitted = st.form_submit_button("Send")
+
+    if submitted:
+        st.session_state.selected_project = project_choice
+        st.session_state.selected_period_key = period_key_choice
+        st.session_state.filters_submitted = True
+
+# ---- Gate the rest of the dashboard until user clicks Send ----
+if not st.session_state.get("filters_submitted", False):
+    st.markdown("""
+    <div class="empty-hero">
+      <div class="box">
+        <div class="title">Load the Dashboard</div>
+        <div class="sub">Choose a <b>Project</b> and <b>Period</b>, then click <b>Send</b> to fetch data.</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.stop()
+
+# Use last submitted filters
+project = st.session_state["selected_project"]
+period_key = st.session_state["selected_period_key"]
+
+# Now that data will load, show note + separator
 st.markdown('<div class="smallnote">*Summary is based on Task Created in Given Period</div>', unsafe_allow_html=True)
 st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
 
@@ -50,7 +91,6 @@ def render_cards_loader(label: str, count: int = 6) -> str:
         "<div class='status-chip'><div class='dot'></div>"
         f"<div>{label}</div></div>"
     )
-    # simple card skeleton: header + 3 lines each
     cards_html = []
     for _ in range(count):
         cards_html.append(
@@ -102,8 +142,8 @@ with sec1.container():
     cards.append("</div>")
     st.markdown("".join(cards), unsafe_allow_html=True)
     st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
-
 #______________________Section 1 ENDS_____________________________________________________________________
+
 
 
 
