@@ -174,3 +174,85 @@ div[data-baseweb="select"] > div {
         font-size: 12px; /* you already shrank font, keep or tweak */
         line-height: 1.2; /* ? ensures no extra vertical space */
     }
+
+
+
+/* ===== Fancy loaders (status chip + shimmer skeleton) ===== */
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid #e6e6ea;
+    border-radius: 999px;
+    background: #fafafa;
+    font-size: 12px;
+    color: #333;
+    margin: 6px 0 8px 0;
+}
+
+    .status-chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #07B176;
+        animation: pulse 1.2s infinite;
+    }
+
+@keyframes pulse {
+    0% {
+        opacity: .25
+    }
+
+    50% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: .25
+    }
+}
+
+/* Skeleton container */
+.skel {
+    border: 1px solid #e6e6ea;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.skel-row {
+    display: grid;
+    grid-template-columns: 140px 120px 1fr 120px 120px 120px 120px;
+}
+
+.skel .cell {
+    height: 16px;
+    margin: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background: #eee;
+}
+
+    .skel .cell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.7), rgba(255,255,255,0));
+        animation: shimmer 1.25s infinite;
+    }
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Sticky header look for skeleton to match your table */
+.skel-head {
+    background: #fafafa;
+    border-bottom: 1px solid #ececec;
+    padding: 8px 6px;
+    font-size: 12px;
+}
