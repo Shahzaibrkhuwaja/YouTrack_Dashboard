@@ -1,6 +1,6 @@
 :root {
   --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
-  --root-font: 12px;
+  --root-font: 11px;
 
   --size-title: 20px;
   --size-section-title: 14px;
@@ -26,16 +26,16 @@
   --bar-thickness: 1px;
   --bar-margin: 5px 0 8px 0;
 
-  --sel-font: 12px;
+  --sel-font: 11px;
   --sel-height: 26px;
   --sel-pad: 2px 6px;
-  --sel-width: 200px;
+  --sel-width: 300px;
 }
 
 /* Global */
 html { font-size: var(--root-font) !important; }
 html, body, [class^="block-container"] { font-family: var(--font); }
-.block-container { padding-top: 18px; padding-bottom: 18px; }
+.block-container { padding-top: 14px; padding-bottom: 15px; }
 
 /* Title */
 .center-title {
@@ -174,3 +174,158 @@ div[data-baseweb="select"] > div {
         font-size: 12px; /* you already shrank font, keep or tweak */
         line-height: 1.2; /* ? ensures no extra vertical space */
     }
+
+
+
+/* ===== Fancy loaders (status chip + shimmer skeleton) ===== */
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid #e6e6ea;
+    border-radius: 999px;
+    background: #fafafa;
+    font-size: 12px;
+    color: #333;
+    margin: 6px 0 8px 0;
+}
+
+    .status-chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #07B176;
+        animation: pulse 1.2s infinite;
+    }
+
+@keyframes pulse {
+    0% {
+        opacity: .25
+    }
+
+    50% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: .25
+    }
+}
+
+/* Skeleton container */
+.skel {
+    border: 1px solid #e6e6ea;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.skel-row {
+    display: grid;
+    grid-template-columns: 140px 120px 1fr 120px 120px 120px 120px;
+}
+
+.skel .cell {
+    height: 16px;
+    margin: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background: #eee;
+}
+
+    .skel .cell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.7), rgba(255,255,255,0));
+        animation: shimmer 1.25s infinite;
+    }
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Sticky header look for skeleton to match your table */
+.skel-head {
+    background: #fafafa;
+    border-bottom: 1px solid #ececec;
+    padding: 8px 6px;
+    font-size: 12px;
+}
+
+
+/* Fancy "Send" button */
+.stForm .stButton > button {
+    background: linear-gradient(90deg, #0748B1, #07B176);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 600;
+    letter-spacing: .2px;
+    box-shadow: 0 6px 14px rgba(7,177,118,.22);
+    transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
+    font-size: 24px;
+    padding: 10px 20px;
+}
+
+    .stForm .stButton > button:hover {
+        filter: saturate(1.05) brightness(1.05);
+        box-shadow: 0 8px 18px rgba(7,177,118,.32);
+    }
+
+    .stForm .stButton > button:active {
+        transform: translateY(1px);
+    }
+
+/* Centered pre-submit hero */
+.empty-hero {
+    height: 42vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .empty-hero .box {
+        text-align: center;
+        background: #fff;
+        border: 2px dashed #e6e6ea;
+        border-radius: 14px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+
+    .empty-hero .title {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: .2px;
+        color: #1f3c6d;
+        margin-bottom: 6px;
+    }
+
+    .empty-hero .sub {
+        font-size: 14px;
+        color: #444;
+    }
+
+
+/* Hide Streamlit top-right toolbar (removes "Deploy" + three-dot menu) */
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+
+/* (Optional) also hide the tiny status dot/text in the header */
+[data-testid="stStatusWidget"] {
+    display: none !important;
+}
+
+/* (Optional) hide the small colored accent bar at very top */
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+
