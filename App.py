@@ -15,6 +15,7 @@ from datetime import datetime
 
 
 
+
 st.set_page_config(page_title="YouTrack Dashboard", layout="wide")
 
 
@@ -31,7 +32,7 @@ _default_project = st.session_state.get("selected_project", ACTIVE_PROJECTS[0])
 _default_period_key = st.session_state.get("selected_period_key", list(PERIOD_LABELS.keys())[0])
 _default_period_label = PERIOD_LABELS[_default_period_key]
 
-# ---- Controls (FORM with Send button) ----
+# ---- Controls----
 with st.form("filters_form", clear_on_submit=False):
     c1, c2, c3 = st.columns([1, 1, 10])
     with c1:
@@ -57,7 +58,7 @@ with st.form("filters_form", clear_on_submit=False):
         )
         period_key_choice = keys[labels.index(selected_label)]
     with c3:
-        st.markdown('<div style="height:22px"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="height:25.3px"></div>', unsafe_allow_html=True)
         submitted = st.form_submit_button("Send")
 
     if submitted:

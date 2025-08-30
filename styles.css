@@ -1,6 +1,6 @@
 :root {
   --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
-  --root-font: 12px;
+  --root-font: 11px;
 
   --size-title: 20px;
   --size-section-title: 14px;
@@ -26,16 +26,16 @@
   --bar-thickness: 1px;
   --bar-margin: 5px 0 8px 0;
 
-  --sel-font: 12px;
+  --sel-font: 11px;
   --sel-height: 26px;
   --sel-pad: 2px 6px;
-  --sel-width: 200px;
+  --sel-width: 300px;
 }
 
 /* Global */
 html { font-size: var(--root-font) !important; }
 html, body, [class^="block-container"] { font-family: var(--font); }
-.block-container { padding-top: 18px; padding-bottom: 18px; }
+.block-container { padding-top: 14px; padding-bottom: 15px; }
 
 /* Title */
 .center-title {
@@ -269,6 +269,8 @@ div[data-baseweb="select"] > div {
     letter-spacing: .2px;
     box-shadow: 0 6px 14px rgba(7,177,118,.22);
     transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
+    font-size: 24px;
+    padding: 10px 20px;
 }
 
     .stForm .stButton > button:hover {
@@ -291,8 +293,8 @@ div[data-baseweb="select"] > div {
     .empty-hero .box {
         text-align: center;
         background: #fff;
-        border: 1px dashed #e6e6ea;
-        border-radius: 12px;
+        border: 2px dashed #e6e6ea;
+        border-radius: 14px;
         padding: 18px 22px;
         box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     }
@@ -309,3 +311,21 @@ div[data-baseweb="select"] > div {
         font-size: 14px;
         color: #444;
     }
+
+
+/* Hide Streamlit top-right toolbar (removes "Deploy" + three-dot menu) */
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+
+/* (Optional) also hide the tiny status dot/text in the header */
+[data-testid="stStatusWidget"] {
+    display: none !important;
+}
+
+/* (Optional) hide the small colored accent bar at very top */
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+
