@@ -2,26 +2,26 @@
     --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
     --root-font: 11px;
     --size-title: 18px; /* H1 (page title) */
-    --size-section-title: 12px; /* H2 (section title) */
+    --size-section-title: 13px; /* H2 (section title) */
     --size-label: 10px;
     --size-card-title: 11px;
     --size-text: 11px;
     --size-pill: 11px;
     --w-type: 800;
     --w-pill: 700;
-    --w-state: 800; /* realistic range (was 1200) */
+    --w-state: 800; 
     --w-note: 900;
     --card-width: 170px;
     --card-min-h: 110px;
     --card-pad: 1px 6px;
-    --card-gap: 3px;
+    --card-gap: 7px;
     --card-border-color: #2f2f2f;
     --card-border-width: 2px;
     --card-radius: 8px;
     --bar-color: #080101;
     --bar-thickness: 1px;
     --bar-margin: 5px 0 1px 0;
-    --sel-font: 10px;
+    --sel-font: 11px;
     --sel-height: 26px;
     --sel-pad: 2px 6px;
     --sel-width: 300px;
@@ -193,7 +193,7 @@ div[data-baseweb="select"] {
     background: #f7f7f9;
     border: 1px solid #e6e6ea;
     border-radius: 15px;
-    padding: 6px 10px;
+    padding: 2px 10px;
     font-size: 12px;
     color: #333;
     white-space: nowrap;
@@ -320,7 +320,7 @@ div[data-baseweb="select"] {
         background: #fff;
         border: 2px dashed #e6e6ea;
         border-radius: 14px;
-        padding: 18px 22px;
+        padding: 10px 12px;
         box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     }
 
@@ -378,6 +378,8 @@ h1.heading--page {
 
 h2.heading--section {
     font-size: var(--size-section-title) !important;
+    margin-top: 12px;
+    padding: inherit;
     line-height: 1.2;
 }
 
