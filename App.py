@@ -12,6 +12,8 @@ from chart_theme import apply_chart_theme
 from youtrack_queries import get_deployments_on_live
 import os
 from datetime import datetime
+from youtrack_queries import get_tasks_in_business_review
+
 
 
 
@@ -359,3 +361,102 @@ with sec3.container():
 # ______________________ Section 3 ENDS ______________________________________
 
 
+# ______________________ Section 4 STARTS ______________________________________
+
+def render_section_loader(label: str) -> str:
+    # (reuses your existing function name if shared; if duplicate, remove this)
+    head = (
+        "<div class='chip chip--status'><div class='dot'></div>"
+        f"<div>{label}</div></div>"
+    )
+    header = "<div class='skel-head'>Preparing table…</div>"
+    rows = []
+    for _ in range(6):  # 6 preview rows
+        cells = "".join("<div class='cell'></div>" for _ in range(5))
+        rows.append(f"<div class='skel-row'>{cells}</div>")
+    return head + "<div class='skel'>" + header + "".join(rows) + "</div>"
+
+st.markdown('<div class="mt-10"></div>', unsafe_allow_html=True)
+st.markdown('<h2 class="heading--section">Tasks in Business Review</h2>', unsafe_allow_html=True)
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+sec4 = st.empty()
+with sec4.container():
+    st.markdown(render_section_loader("Loading business review…"), unsafe_allow_html=True)
+
+# Fetch while loader is visible (no period filter here)
+br_resp = get_tasks_in_business_review(project)
+br_items = br_resp.get("items", []) or []
+
+# Replace loader with final UI
+sec4.empty()
+with sec4.container():
+    # KPIs (same structure/order as Section 3)
+    type_counts = {}
+    for it in br_items:
+        t = (it.get("type") or "Unspecified").strip()
+        type_counts[t] = type_counts.get(t, 0) + 1
+
+    def _pill(label, value):
+        return f"<div class='kpi__pill'><b>{label}:</b> {value}</div>"
+
+    preferred = [
+        "Bug", "Change Request", "New Requirement", "Enhancement",
+        "System Understanding", "Tech Task", "Exceptional Cases",
+        "External Dependency", "End User Mistake",
+    ]
+    present = list(type_counts.keys())
+    ordered = [t for t in preferred if t in present] + sorted(t for t in present if t not in preferred)
+
+    kpis = [
+        _pill("Total BR Tasks", len(br_items)),
+    ] + [_pill(t, type_counts.get(t, 0)) for t in ordered]
+
+    st.markdown("<div class='kpi'>" + "".join(kpis) + "</div>", unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+    # Build YouTrack base for links
+    base = os.getenv("YOUTRACK_URL", "").rstrip("/")
+    def issue_link(key: str) -> str:
+        return f"{base}/issue/{key}" if (base and key) else "#"
+
+    # Table
+    table_html = [
+        "<div class='table-wrap'>",
+        "<table class='table table--compact'>",
+        "<thead><tr>",
+        "<th>Task ID</th><th>Title</th><th>Type</th><th>State</th><th>Created On</th>",
+        "</tr></thead>",
+        "<tbody>",
+    ]
+
+    if not br_items:
+        table_html.append("<tr><td colspan='5' class='muted'>No Business Review tasks found for this Project.</td></tr>")
+    else:
+        # Sort: newest first (by created_on), then Task ID
+        def _parse_date(d):
+            try:
+                return datetime.strptime(d or "", "%Y-%m-%d")
+            except Exception:
+                return datetime.min
+        items_sorted = sorted(br_items, key=lambda r: (_parse_date(r.get('created_on')), r.get('id') or ""), reverse=True)
+
+        for it in items_sorted:
+            href = issue_link(it.get("id"))
+            title = (it.get("title") or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+            table_html.append(
+                "<tr>"
+                f"<td><a class='state-link' href='{href}' target='_blank'>{it.get('id','')}</a></td>"
+                f"<td>{title}</td>"
+                f"<td>{it.get('type','')}</td>"
+                f"<td>{it.get('state','')}</td>"
+                f"<td>{it.get('created_on','')}</td>"
+                "</tr>"
+            )
+
+    table_html.append("</tbody></table>")
+    table_html.append("</div>")
+    st.markdown("".join(table_html), unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+# ______________________ Section 4 ENDS ______________________________________

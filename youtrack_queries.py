@@ -543,3 +543,68 @@ def _extract_due_date_iso(issue) -> str | None:
                     return s
     return None
 # ================== /Section 3: Deployments on Live (backend) ==================
+
+
+
+# ================== Section 4: Tasks in Business Review ==================
+from datetime import datetime, timezone
+
+def get_tasks_in_business_review(project: str) -> dict:
+    """
+    Top-level issues in Business Review for the given project.
+    Period-agnostic (no created filter). Excludes subtasks.
+    """
+    if not project or not YOUTRACK_URL or not YOUTRACK_TOKEN:
+        return {"items": [], "debug": {"query": "", "count": 0}}
+
+    proj_clause = f"project: {{{project}}}"
+    no_subtasks_clause = "has: -{subtask of}"
+
+    # Try the OR clause (parenthesized), fall back to single state if the OR form 400s in your instance.
+    state_or_clause = "(State:{Business Review} or State:{In Business Review})"
+    state_single_clause = "State:{In Business Review}"
+
+    # First attempt with OR
+    yt_query = f"{proj_clause} {state_or_clause} {no_subtasks_clause}".strip()
+
+    fields = (
+        "idReadable,summary,created,project(shortName),"
+        "customFields(name,value(name,localizedName))"
+    )
+
+    items: list[dict] = []
+
+    def _collect(query: str) -> list[dict]:
+        out = []
+        for it in _iter_issues_with_fields(query, fields=fields, page_size=100):
+            iid = (it.get("idReadable") or "").strip()
+            if not iid:
+                continue
+            title = (it.get("summary") or "").strip()
+            itype = _extract_type_from_issue(it) or "Unspecified"
+            istate = _extract_state_from_issue(it) or "Unspecified"
+            created_iso = ""
+            ms = it.get("created")
+            if isinstance(ms, (int, float)) and ms > 0:
+                created_iso = datetime.fromtimestamp(ms / 1000.0, tz=timezone.utc).date().isoformat()
+            out.append({
+                "id": iid,
+                "title": title,
+                "type": itype,
+                "state": istate,
+                "created_on": created_iso,
+            })
+        return out
+
+    try:
+        items = _collect(yt_query)
+        debug_query = yt_query
+    except requests.HTTPError as e:
+        # If the OR form is not accepted, retry with the single-state clause
+        yt_query_single = f"{proj_clause} {state_single_clause} {no_subtasks_clause}".strip()
+        items = _collect(yt_query_single)
+        debug_query = yt_query_single
+
+    return {"items": items, "debug": {"query": debug_query, "count": len(items)}}
+# ==================/Section 4 ==================
+

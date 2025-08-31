@@ -20,7 +20,7 @@
     --card-radius: 8px;
     --bar-color: #080101;
     --bar-thickness: 1px;
-    --bar-margin: 5px 0 8px 0;
+    --bar-margin: 5px 0 1px 0;
     --sel-font: 10px;
     --sel-height: 26px;
     --sel-pad: 2px 6px;
@@ -37,8 +37,8 @@ html, body, [class^="block-container"] {
 }
 
 .block-container {
-    padding-top: 17px;
-    padding-bottom: 15px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 /* === Form labels === */
@@ -359,7 +359,7 @@ div[data-baseweb="select"] {
     text-align: center;
     font-size: var(--size-title);
     font-weight: 800;
-    margin: 6px 0 2px 0;
+    margin: 0px 0 0px 0;
     letter-spacing: .2px;
 }
 
@@ -367,7 +367,7 @@ div[data-baseweb="select"] {
     text-align: center;
     font-weight: 800;
     font-size: var(--size-section-title);
-    margin: 0 0 6px 0;
+    margin: 0px 0 0px 0;
 }
 
 h1.heading--page {
