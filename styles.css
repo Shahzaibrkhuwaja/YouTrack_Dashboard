@@ -1,202 +1,163 @@
 :root {
-  --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
-  --root-font: 11px;
-
-  --size-title: 18px;
-  --size-section-title: 12px;
-  --size-label: 10px;
-  --size-card-title: 11px;
-  --size-text: 11px;
-  --size-pill: 11px;
-
-  --w-type: 800;
-  --w-pill: 700;
-  --w-state: 1200;
-  --w-note: 900;
-
-  --card-width: 170px;
-  --card-min-h: 110px;
-  --card-pad: 1px 6px;
-  --card-gap: 3px;
-  --card-border-color: #2f2f2f;
-  --card-border-width: 2px;
-  --card-radius: 8px;
-
-  --bar-color: #080101;
-  --bar-thickness: 1px;
-  --bar-margin: 5px 0 8px 0;
-
-  --sel-font: 10px;
-  --sel-height: 26px;
-  --sel-pad: 2px 6px;
-  --sel-width: 300px;
+    --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    --root-font: 11px;
+    --size-title: 18px; /* H1 (page title) */
+    --size-section-title: 12px; /* H2 (section title) */
+    --size-label: 10px;
+    --size-card-title: 11px;
+    --size-text: 11px;
+    --size-pill: 11px;
+    --w-type: 800;
+    --w-pill: 700;
+    --w-state: 800; /* realistic range (was 1200) */
+    --w-note: 900;
+    --card-width: 170px;
+    --card-min-h: 110px;
+    --card-pad: 1px 6px;
+    --card-gap: 3px;
+    --card-border-color: #2f2f2f;
+    --card-border-width: 2px;
+    --card-radius: 8px;
+    --bar-color: #080101;
+    --bar-thickness: 1px;
+    --bar-margin: 5px 0 8px 0;
+    --sel-font: 10px;
+    --sel-height: 26px;
+    --sel-pad: 2px 6px;
+    --sel-width: 300px;
 }
 
-/* Global */
-html { font-size: var(--root-font) !important; }
-html, body, [class^="block-container"] { font-family: var(--font); }
-.block-container { padding-top: 17px; padding-bottom: 15px; }
-
-/* Title */
-.center-title {
-  text-align:center; font-size: var(--size-title); font-weight: 800;
-  margin: 6px 0 2px 0; letter-spacing: .2px;
+/* === Global === */
+html {
+    font-size: var(--root-font) !important;
 }
 
-/* Dividers */
-.bar {
-  height: var(--bar-thickness);
-  background: var(--bar-color);
-  margin: var(--bar-margin);
+html, body, [class^="block-container"] {
+    font-family: var(--font);
 }
 
-/* Form labels */
-.label { font-weight:700; font-size: var(--size-label); margin-bottom: 4px; }
-
-/* Section title */
-.section-title {
-  text-align:center; font-weight:800; margin: 0px 0 0px 0;
-  font-size: var(--size-section-title);
+.block-container {
+    padding-top: 17px;
+    padding-bottom: 15px;
 }
 
-
-
-/* Card grid */
-.row { display:flex; flex-wrap: wrap; gap: var(--card-gap); align-items: stretch; }
-.card {
-  width: var(--card-width);
-  border: var(--card-border-width) solid var(--card-border-color);
-  border-radius: var(--card-radius);
-  background:#fff;
-  padding: var(--card-pad);
-  min-height: var(--card-min-h);
-  box-sizing: border-box;
-}
-.card h4 {
-  margin: 0;
-  font-size: var(--size-card-title);
-  font-weight: 600; 
-  display:flex; align-items:center; text-wrap:auto ;gap: 3px;
-}
-.card h4 .type-label { font-weight: var(--w-type); }
-.card .muted {
-  font-size: var(--size-text); color:#333;
-  line-height: 1.2; margin-top: 0;
-}
-.card .muted .state-count { font-weight: var(--w-state); }
-
-.pill {
-  display:inline-flex; align-items:center; justify-content:center;
-  width: 36px; height: 20px; padding: 0 8px;
-  border: var(--card-border-width) solid var(--card-border-color);
-  border-radius:999px;
-  font-size: var(--size-pill);
-  font-weight: var(--w-pill);
-  background:#eee;
+/* === Form labels === */
+.label {
+    font-weight: 700;
+    font-size: var(--size-label);
+    margin-bottom: 4px;
 }
 
-
-
-/* --- Link resets inside cards (force override Streamlit blue) --- */
-.card a.chip-link,
-.card a.chip-link:link,
-.card a.chip-link:visited,
-.card a.state-link,
-.card a.state-link:link,
-.card a.state-link:visited,
-.card h4 a.type-label,
-.card h4 a.type-label:link,
-.card h4 a.type-label:visited {
-    color: inherit !important;
-    text-decoration: none !important;
-    font-weight: inherit !important;
-}
-.card a.chip-link:hover,
-.card a.state-link:hover,
-.card h4 a.type-label:hover {
-  text-decoration: underline !important;  /* change to 'none' if you prefer no hover underline */
-  color: inherit !important;
-}
-
-.smallnote { font-size: var(--size-text); font-weight: var(--w-note); margin-top: 6px; }
-
-/* Selectbox sizing */
-.stSelectbox { max-width: var(--sel-width); }
-div[data-baseweb="select"] {
-  font-size: var(--sel-font);
-  min-height: var(--sel-height) !important;
-}
-div[data-baseweb="select"] > div {
-  min-height: var(--sel-height) !important;
-  padding: var(--sel-pad) !important;
-  line-height: 1.2;
-}
-
-
-
-/* Section 3: centered KPI strip */
-.kpi-strip {
+/* === Card grid === */
+.row {
     display: flex;
-    justify-content: center; /* center horizontally */
-    align-items: center;
-    gap: 18px;
     flex-wrap: wrap;
-    margin: 6px 0 2px 0;
+    gap: var(--card-gap);
+    align-items: stretch;
 }
 
-.kpi-pill {
-    background: #f7f7f9;
-    border: 1px solid #e6e6ea;
-    border-radius: 15px;
-    padding: 6px 10px;
-    font-size: 12px;
-    color: #333;
+.card {
+    width: var(--card-width);
+    border: var(--card-border-width) solid var(--card-border-color);
+    border-radius: var(--card-radius);
+    background: #fff;
+    padding: var(--card-pad);
+    min-height: var(--card-min-h);
+    box-sizing: border-box;
 }
 
-/* Section 3: scrollable table (~5 rows) */
-.table-scroll {
-    max-height: 200px; 
-    overflow-y: auto;
-    border: 1px solid #e6e6ea;
-    border-radius: 6px;
-}
-
-.yt-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-    .yt-table thead th {
-        position: sticky;
-        top: 0;
-        background: #fafafa;
-        z-index: 1;
+    .card h4 {
+        margin: 0;
+        font-size: var(--size-card-title);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        overflow-wrap: anywhere;
     }
 
-    .yt-table th, .yt-table td {
-        padding: 4px 6px; /* ? less vertical & horizontal padding */
-        border-bottom: 1px solid #ececec;
-        font-size: 12px; /* you already shrank font, keep or tweak */
-        line-height: 1.2; /* ? ensures no extra vertical space */
+        .card h4 .type-label {
+            font-weight: var(--w-type);
+        }
+
+    .card .muted {
+        font-size: var(--size-text);
+        color: #333;
+        line-height: 1.2;
+        margin-top: 0;
     }
 
+        .card .muted .state-count {
+            font-weight: var(--w-state);
+        }
 
+    /* Link resets inside cards */
+    .card a.chip-link,
+    .card a.state-link,
+    .card h4 a.type-label {
+        color: inherit !important;
+        text-decoration: none !important;
+        font-weight: inherit !important;
+    }
 
-/* ===== Fancy loaders (status chip + shimmer skeleton) ===== */
-.status-chip {
+        .card a.chip-link:hover,
+        .card a.state-link:hover,
+        .card h4 a.type-label:hover {
+            text-decoration: underline !important;
+            color: inherit !important;
+        }
+
+.smallnote {
+    font-size: var(--size-text);
+    font-weight: var(--w-note);
+    margin-top: 6px;
+}
+
+/* === Selectbox sizing === */
+.stSelectbox {
+    max-width: var(--sel-width);
+}
+
+div[data-baseweb="select"] {
+    font-size: var(--sel-font);
+    min-height: var(--sel-height) !important;
+}
+
+    div[data-baseweb="select"] > div {
+        min-height: var(--sel-height) !important;
+        padding: var(--sel-pad) !important;
+        line-height: 1.2;
+    }
+
+/* === Chip component (generic) === */
+.chip {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: var(--size-pill);
+    font-weight: var(--w-pill);
+    white-space: nowrap;
+}
+
+.chip--count { /* used for totals (Section-1) */
+    min-width: 36px;
+    height: 20px;
+    padding: 0 8px;
+    border: var(--card-border-width) solid var(--card-border-color);
+    background: #eee;
+}
+
+.chip--status { /* used for loaders */
     gap: 8px;
     padding: 6px 10px;
     border: 1px solid #e6e6ea;
-    border-radius: 999px;
     background: #fafafa;
     font-size: 12px;
     color: #333;
-    margin: 6px 0 8px 0;
 }
 
-    .status-chip .dot {
+    .chip--status .dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
@@ -218,7 +179,42 @@ div[data-baseweb="select"] > div {
     }
 }
 
-/* Skeleton container */
+/* === KPI component === */
+.kpi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 6px 0 2px 0;
+}
+
+.kpi__pill {
+    background: #f7f7f9;
+    border: 1px solid #e6e6ea;
+    border-radius: 15px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+/* semantic variants */
+.kpi__pill--ok {
+    border-color: #d9f2e6;
+    background: #f2fbf7;
+}
+
+.kpi__pill--warn {
+    border-color: #ffe3ad;
+    background: #fff7e6;
+}
+
+.kpi__pill--info {
+    border-color: #cfe3ff;
+    background: #f0f6ff;
+}
+
+/* === Skeletons === */
 .skel {
     border: 1px solid #e6e6ea;
     border-radius: 6px;
@@ -234,9 +230,9 @@ div[data-baseweb="select"] > div {
     height: 16px;
     margin: 8px;
     border-radius: 4px;
+    background: #eee;
     position: relative;
     overflow: hidden;
-    background: #eee;
 }
 
     .skel .cell::after {
@@ -254,7 +250,6 @@ div[data-baseweb="select"] > div {
     }
 }
 
-/* Sticky header look for skeleton to match your table */
 .skel-head {
     background: #fafafa;
     border-bottom: 1px solid #ececec;
@@ -262,20 +257,45 @@ div[data-baseweb="select"] > div {
     font-size: 12px;
 }
 
+/* Chart skeleton (bars) */
+.skel-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 120px;
+    margin-top: 8px;
+}
 
-/* Fancy "Send" button */
+.skel-bar {
+    width: 14px;
+    height: 60px;
+    background: #eee;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+    .skel-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.7), rgba(255,255,255,0));
+        animation: shimmer 1.25s infinite;
+    }
+
+/* === Fancy "Send" button === */
 .stForm .stButton > button {
     background: linear-gradient(90deg, #0748B1, #07B176);
     color: #fff;
     border: 0;
     border-radius: 999px;
-    padding: 8px 18px;
     font-weight: 600;
     letter-spacing: .2px;
-    box-shadow: 0 6px 14px rgba(7,177,118,.22);
-    transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
     font-size: 24px;
     padding: 10px 20px;
+    box-shadow: 0 6px 14px rgba(7,177,118,.22);
+    transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
 }
 
     .stForm .stButton > button:hover {
@@ -287,7 +307,7 @@ div[data-baseweb="select"] > div {
         transform: translateY(1px);
     }
 
-/* Centered pre-submit hero */
+/* === Empty state (pre-submit hero) === */
 .empty-hero {
     height: 42vh;
     display: flex;
@@ -317,22 +337,99 @@ div[data-baseweb="select"] > div {
         color: #444;
     }
 
-
-/* Hide Streamlit top-right toolbar (removes "Deploy" + three-dot menu) */
-[data-testid="stToolbar"] {
-    display: none !important;
+/* === Utilities === */
+.mt-10 {
+    margin-top: 10px;
 }
 
-/* (Optional) also hide the tiny status dot/text in the header */
-[data-testid="stStatusWidget"] {
-    display: none !important;
+.mt-20 {
+    margin-top: 20px;
 }
 
-/* (Optional) hide the small colored accent bar at very top */
-[data-testid="stDecoration"] {
-    display: none !important;
+.spacer-20 {
+    height: 20px;
 }
 
+.card h4 .type-label {
+    flex: 1 1 auto;
+}
 
+/* === Headings === */
+.heading--page {
+    text-align: center;
+    font-size: var(--size-title);
+    font-weight: 800;
+    margin: 6px 0 2px 0;
+    letter-spacing: .2px;
+}
 
+.heading--section {
+    text-align: center;
+    font-weight: 800;
+    font-size: var(--size-section-title);
+    margin: 0 0 6px 0;
+}
 
+h1.heading--page {
+    font-size: var(--size-title) !important;
+    line-height: 1.25;
+    margin: 10px 0 0 0;
+}
+
+h2.heading--section {
+    font-size: var(--size-section-title) !important;
+    line-height: 1.2;
+}
+
+/* === Divider === */
+.divider {
+    height: var(--bar-thickness);
+    background: var(--bar-color);
+    margin: var(--bar-margin);
+}
+
+/* === Table component === */
+.table-wrap {
+    max-height: 220px;
+    overflow: auto;
+    border: 1px solid #e6e6ea;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #fff;
+}
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #fafafa;
+        color: #333;
+        font-weight: 700;
+        text-align: left;
+        border-bottom: 1px solid #e6e6ea;
+        z-index: 1;
+    }
+
+    .table th, .table td {
+        padding: 8px 6px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: top;
+    }
+
+.table--compact th, .table--compact td {
+    padding: 6px 4px;
+}
+
+.table tr:hover td {
+    background: #fcfcfd;
+}
+
+/* === Streamlit chrome overrides === */
+[data-testid="stToolbar"], [data-testid="stStatusWidget"], [data-testid="stDecoration"] {
+    display: none !important;
+}
