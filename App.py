@@ -8,10 +8,12 @@ import plotly.graph_objects as go
 from datetime import date
 from youtrack_queries import get_monthly_task_counts_by_type
 import calendar
-from chart_theme import apply_chart_theme, DEFAULT_COLORWAY
+from chart_theme import apply_chart_theme
 from youtrack_queries import get_deployments_on_live
 import os
 from datetime import datetime
+from youtrack_queries import get_tasks_in_business_review
+
 
 
 
@@ -25,7 +27,7 @@ with open("styles.css", "r", encoding="utf-8") as f:
 
 #______________________Section 1 STARTS___________________________________________________________________
 #  Header
-st.markdown('<div class="center-title">YouTrack Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<h1 class="heading--page">YouTrack Dashboard</h1>', unsafe_allow_html=True)
 
 # ---- Defaults from session (persist last submitted) ----
 _default_project = st.session_state.get("selected_project", ACTIVE_PROJECTS[0])
@@ -58,7 +60,7 @@ with st.form("filters_form", clear_on_submit=False):
         )
         period_key_choice = keys[labels.index(selected_label)]
     with c3:
-        st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="spacer-20"></div>', unsafe_allow_html=True)
         submitted = st.form_submit_button("Send")
 
     if submitted:
@@ -84,14 +86,15 @@ period_key = st.session_state["selected_period_key"]
 
 # Now that data will load, show note + separator
 st.markdown('<div class="smallnote">*Summary is based on Task Created in Given Period</div>', unsafe_allow_html=True)
-st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
 # --- Fancy loader helper for the cards (status chip + shimmer cards) ---
 def render_cards_loader(label: str, count: int = 6) -> str:
     head = (
-        "<div class='status-chip'><div class='dot'></div>"
+        "<div class='chip chip--status'><div class='dot'></div>"
         f"<div>{label}</div></div>"
     )
+
     cards_html = []
     for _ in range(count):
         cards_html.append(
@@ -134,30 +137,31 @@ with sec1.container():
             cards.append(
                 f"<div class='card'>"
                 f"  <h4>"
-                f"    <a class='chip-link type-label' href='{type_href}' target='_blank' style='flex:1 1 auto'>{typ}:</a>"
-                f"    <span class='pill'>{total}</span>"
+                f"    <a class='chip-link type-label' href='{type_href}' target='_blank'>{typ}:</a>"
+                f"    <span class='chip chip--count'>{total}</span>"
                 f"  </h4>"
                 f"  <div class='muted'>{state_lines}</div>"
                 f"</div>"
             )
     cards.append("</div>")
     st.markdown("".join(cards), unsafe_allow_html=True)
-    st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 #______________________Section 1 ENDS_____________________________________________________________________
 
 
 
 
 #______________________Section 2 STARTS___________________________________________________________________
-st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
-st.markdown('<div class="section-title">Tasks Created Per Month in Current Year (by Type)</div>', unsafe_allow_html=True)
+st.markdown('<div class="mt-10"></div>', unsafe_allow_html=True)
+st.markdown('<h2 class="heading--section">Tasks Created Per Month in Current Year (by Type)</h2>', unsafe_allow_html=True)
 
 #loader
 def render_chart_loader(label: str) -> str:
     head = (
-        "<div class='status-chip'><div class='dot'></div>"
+        "<div class='chip chip--status'><div class='dot'></div>"
         f"<div>{label}</div></div>"
     )
+
     # 12 month placeholders (compact)
     months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
     bars = "".join(f"<div class='skel-bar' title='{m}'></div>" for m in months)
@@ -217,17 +221,17 @@ with sec2.container():
             fig,
             show_bar_text=True,
             bar_text_color="#111",
-            bar_text_size=12,
-            height=250,
-            margin_t=10,
+            bar_text_size=11,
+            height=320,
+            margin_t=50,
             margin_b=0,
             legend_orientation="v",
             legend_x=1.02, legend_y=1, legend_xanchor="left", legend_yanchor="top",
         )
 
-        st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True)
-        st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 #______________________Section 2 ENDS_____________________________________________________________________
 
 
@@ -238,9 +242,10 @@ with sec2.container():
 #loader
 def render_section_loader(label: str) -> str:
     head = (
-        "<div class='status-chip'><div class='dot'></div>"
+        "<div class='chip chip--status'><div class='dot'></div>"
         f"<div>{label}</div></div>"
     )
+
     header = "<div class='skel-head'>Preparing table…</div>"
     rows = []
     for _ in range(6):  # 6 preview rows
@@ -248,9 +253,9 @@ def render_section_loader(label: str) -> str:
         rows.append(f"<div class='skel-row'>{cells}</div>")
     return head + "<div class='skel'>" + header + "".join(rows) + "</div>"
 
-st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-st.markdown('<div class="section-title">Deployments</div>', unsafe_allow_html=True)
-st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+st.markdown('<div class="mt-10"></div>', unsafe_allow_html=True)
+st.markdown('<h2 class="heading--section">Deployments</h2>', unsafe_allow_html=True)
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
 # Stable mount point + immediate custom loader
 sec3 = st.empty()
@@ -287,7 +292,7 @@ with sec3.container():
 
     # --- KPI strip (centered) ---
     def _pill(label, value):
-        return f"<div class='kpi-pill'><b>{label}:</b> {value}</div>"
+        return f"<div class='kpi__pill'><b>{label}:</b> {value}</div>"
 
     preferred = [
         "Bug", "Change Request", "New Requirement", "Enhancement",
@@ -305,8 +310,8 @@ with sec3.container():
     for t in ordered:
         kpis.append(_pill(t, type_counts.get(t, 0)))
 
-    st.markdown("<div class='kpi-strip'>" + "".join(kpis) + "</div>", unsafe_allow_html=True)
-    st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+    st.markdown("<div class='kpi'>" + "".join(kpis) + "</div>", unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
     # Build YouTrack links
     base = os.getenv("YOUTRACK_URL", "").rstrip("/")
@@ -323,8 +328,8 @@ with sec3.container():
 
     # Render table
     table_html = [
-        "<div class='table-scroll'>",
-        "<table class='yt-table'>",
+        "<div class='table-wrap'>",
+        "<table class='table table--sticky table--compact'>",
         "<thead><tr>",
         "<th>Deployment ID</th><th>Task ID</th><th>Title</th><th>Type</th><th>State</th><th>Created On</th><th>Deployed On</th>",
         "</tr></thead>",
@@ -352,7 +357,106 @@ with sec3.container():
     table_html.append("</tbody></table>")
     table_html.append("</div>")
     st.markdown("".join(table_html), unsafe_allow_html=True)
-    st.markdown('<div class="bar"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 # ______________________ Section 3 ENDS ______________________________________
 
 
+# ______________________ Section 4 STARTS ______________________________________
+
+def render_section_loader(label: str) -> str:
+    # (reuses your existing function name if shared; if duplicate, remove this)
+    head = (
+        "<div class='chip chip--status'><div class='dot'></div>"
+        f"<div>{label}</div></div>"
+    )
+    header = "<div class='skel-head'>Preparing table…</div>"
+    rows = []
+    for _ in range(6):  # 6 preview rows
+        cells = "".join("<div class='cell'></div>" for _ in range(5))
+        rows.append(f"<div class='skel-row'>{cells}</div>")
+    return head + "<div class='skel'>" + header + "".join(rows) + "</div>"
+
+st.markdown('<div class="mt-10"></div>', unsafe_allow_html=True)
+st.markdown('<h2 class="heading--section">Tasks in Business Review</h2>', unsafe_allow_html=True)
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+sec4 = st.empty()
+with sec4.container():
+    st.markdown(render_section_loader("Loading business review…"), unsafe_allow_html=True)
+
+# Fetch while loader is visible (no period filter here)
+br_resp = get_tasks_in_business_review(project)
+br_items = br_resp.get("items", []) or []
+
+# Replace loader with final UI
+sec4.empty()
+with sec4.container():
+    # KPIs (same structure/order as Section 3)
+    type_counts = {}
+    for it in br_items:
+        t = (it.get("type") or "Unspecified").strip()
+        type_counts[t] = type_counts.get(t, 0) + 1
+
+    def _pill(label, value):
+        return f"<div class='kpi__pill'><b>{label}:</b> {value}</div>"
+
+    preferred = [
+        "Bug", "Change Request", "New Requirement", "Enhancement",
+        "System Understanding", "Tech Task", "Exceptional Cases",
+        "External Dependency", "End User Mistake",
+    ]
+    present = list(type_counts.keys())
+    ordered = [t for t in preferred if t in present] + sorted(t for t in present if t not in preferred)
+
+    kpis = [
+        _pill("Total BR Tasks", len(br_items)),
+    ] + [_pill(t, type_counts.get(t, 0)) for t in ordered]
+
+    st.markdown("<div class='kpi'>" + "".join(kpis) + "</div>", unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+    # Build YouTrack base for links
+    base = os.getenv("YOUTRACK_URL", "").rstrip("/")
+    def issue_link(key: str) -> str:
+        return f"{base}/issue/{key}" if (base and key) else "#"
+
+    # Table
+    table_html = [
+        "<div class='table-wrap'>",
+        "<table class='table table--compact'>",
+        "<thead><tr>",
+        "<th>Task ID</th><th>Title</th><th>Type</th><th>State</th><th>Created On</th>",
+        "</tr></thead>",
+        "<tbody>",
+    ]
+
+    if not br_items:
+        table_html.append("<tr><td colspan='5' class='muted'>No Business Review tasks found for this Project.</td></tr>")
+    else:
+        # Sort: newest first (by created_on), then Task ID
+        def _parse_date(d):
+            try:
+                return datetime.strptime(d or "", "%Y-%m-%d")
+            except Exception:
+                return datetime.min
+        items_sorted = sorted(br_items, key=lambda r: (_parse_date(r.get('created_on')), r.get('id') or ""), reverse=True)
+
+        for it in items_sorted:
+            href = issue_link(it.get("id"))
+            title = (it.get("title") or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+            table_html.append(
+                "<tr>"
+                f"<td><a class='state-link' href='{href}' target='_blank'>{it.get('id','')}</a></td>"
+                f"<td>{title}</td>"
+                f"<td>{it.get('type','')}</td>"
+                f"<td>{it.get('state','')}</td>"
+                f"<td>{it.get('created_on','')}</td>"
+                "</tr>"
+            )
+
+    table_html.append("</tbody></table>")
+    table_html.append("</div>")
+    st.markdown("".join(table_html), unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+# ______________________ Section 4 ENDS ______________________________________
