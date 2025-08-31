@@ -2,22 +2,22 @@
   --font: Bahnschrift, 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   --root-font: 11px;
 
-  --size-title: 20px;
-  --size-section-title: 14px;
-  --size-label: 13px;
-  --size-card-title: 13px;
-  --size-text: 12px;
-  --size-pill: 12px;
+  --size-title: 18px;
+  --size-section-title: 12px;
+  --size-label: 10px;
+  --size-card-title: 11px;
+  --size-text: 11px;
+  --size-pill: 11px;
 
   --w-type: 800;
   --w-pill: 700;
-  --w-state: 700;
+  --w-state: 1200;
   --w-note: 900;
 
-  --card-width: 210px;
+  --card-width: 170px;
   --card-min-h: 110px;
-  --card-pad: 1px 10px;
-  --card-gap: 6px;
+  --card-pad: 1px 6px;
+  --card-gap: 3px;
   --card-border-color: #2f2f2f;
   --card-border-width: 2px;
   --card-radius: 8px;
@@ -26,7 +26,7 @@
   --bar-thickness: 1px;
   --bar-margin: 5px 0 8px 0;
 
-  --sel-font: 11px;
+  --sel-font: 10px;
   --sel-height: 26px;
   --sel-pad: 2px 6px;
   --sel-width: 300px;
@@ -35,7 +35,7 @@
 /* Global */
 html { font-size: var(--root-font) !important; }
 html, body, [class^="block-container"] { font-family: var(--font); }
-.block-container { padding-top: 14px; padding-bottom: 15px; }
+.block-container { padding-top: 17px; padding-bottom: 15px; }
 
 /* Title */
 .center-title {
@@ -59,6 +59,8 @@ html, body, [class^="block-container"] { font-family: var(--font); }
   font-size: var(--size-section-title);
 }
 
+
+
 /* Card grid */
 .row { display:flex; flex-wrap: wrap; gap: var(--card-gap); align-items: stretch; }
 .card {
@@ -73,8 +75,8 @@ html, body, [class^="block-container"] { font-family: var(--font); }
 .card h4 {
   margin: 0;
   font-size: var(--size-card-title);
-  font-weight: 600; /* base; parts below override */
-  display:flex; align-items:center; gap: 3px;
+  font-weight: 600; 
+  display:flex; align-items:center; text-wrap:auto ;gap: 3px;
 }
 .card h4 .type-label { font-weight: var(--w-type); }
 .card .muted {
@@ -85,13 +87,15 @@ html, body, [class^="block-container"] { font-family: var(--font); }
 
 .pill {
   display:inline-flex; align-items:center; justify-content:center;
-  width: 42px; height: 20px; padding: 0 8px;
+  width: 36px; height: 20px; padding: 0 8px;
   border: var(--card-border-width) solid var(--card-border-color);
   border-radius:999px;
   font-size: var(--size-pill);
   font-weight: var(--w-pill);
   background:#eee;
 }
+
+
 
 /* --- Link resets inside cards (force override Streamlit blue) --- */
 .card a.chip-link,
@@ -103,9 +107,9 @@ html, body, [class^="block-container"] { font-family: var(--font); }
 .card h4 a.type-label,
 .card h4 a.type-label:link,
 .card h4 a.type-label:visited {
-  color: inherit !important;
-  text-decoration: none !important;
-  font-weight: inherit !important;
+    color: inherit !important;
+    text-decoration: none !important;
+    font-weight: inherit !important;
 }
 .card a.chip-link:hover,
 .card a.state-link:hover,
@@ -127,6 +131,7 @@ div[data-baseweb="select"] > div {
   padding: var(--sel-pad) !important;
   line-height: 1.2;
 }
+
 
 
 /* Section 3: centered KPI strip */
@@ -327,5 +332,7 @@ div[data-baseweb="select"] > div {
 [data-testid="stDecoration"] {
     display: none !important;
 }
+
+
 
 

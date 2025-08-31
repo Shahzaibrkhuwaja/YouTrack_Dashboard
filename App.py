@@ -34,7 +34,7 @@ _default_period_label = PERIOD_LABELS[_default_period_key]
 
 # ---- Controls----
 with st.form("filters_form", clear_on_submit=False):
-    c1, c2, c3 = st.columns([1, 1, 10])
+    c1, c2, c3 = st.columns([1, 1, 5])
     with c1:
         st.markdown('<div class="label">Project</div>', unsafe_allow_html=True)
         project_choice = st.selectbox(
@@ -58,7 +58,7 @@ with st.form("filters_form", clear_on_submit=False):
         )
         period_key_choice = keys[labels.index(selected_label)]
     with c3:
-        st.markdown('<div style="height:25.3px"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
         submitted = st.form_submit_button("Send")
 
     if submitted:
